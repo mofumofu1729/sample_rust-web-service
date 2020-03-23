@@ -1,1 +1,1 @@
-web: ./target/release/aws_examples
+web: ./target/release/awc_examples
