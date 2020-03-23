@@ -48,6 +48,12 @@ struct HttpBinResponse {
     url: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct News {
+    day: String,
+    content: String,
+}
+
 /// validate data, post json to httpbin, get it back in the response body, return deserialized
 async fn step_x(data: SomeData, client: &Client) -> Result<SomeData, Error> {
     // validate data
@@ -81,6 +87,17 @@ async fn create_something(
         .body(serde_json::to_string(&d).unwrap()))
 }
 
+async fn todays_shami_momo(
+    _client: web::Data<Client>,
+) -> Result<HttpResponse, Error> {
+    let news = News { day: "today".to_string(), content: "Shamiko are going to go on date with Momo.".to_string() };
+
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(serde_json::to_string(&news)?))
+}
+
+
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
@@ -96,6 +113,7 @@ async fn main() -> io::Result<()> {
         App::new()
             .data(Client::default())
             .service(web::resource("/something").route(web::post().to(create_something)))
+            .service(web::resource("/shami_momo").route(web::get().to(todays_shami_momo)))
     })
     //.bind(endpoint)?
     .bind(("0.0.0.0", port))? 
