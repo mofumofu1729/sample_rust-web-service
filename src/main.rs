@@ -90,7 +90,7 @@ async fn create_something(
 async fn todays_shami_momo(
     _client: web::Data<Client>,
 ) -> Result<HttpResponse, Error> {
-    let news = News { day: "today".to_string(), content: "Shamiko are going to go on date with Momo.".to_string() };
+    let news = News { day: "today".to_string(), content: "Shamiko is going to go on date with Momo.".to_string() };
 
     Ok(HttpResponse::Ok()
         .content_type("application/json")
