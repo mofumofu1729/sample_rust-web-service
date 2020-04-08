@@ -54,6 +54,13 @@ struct News {
     content: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Team {
+    team_abbreviation: String,
+    active_area: String,
+    join_year: u32,
+}
+
 /// validate data, post json to httpbin, get it back in the response body, return deserialized
 async fn step_x(data: SomeData, client: &Client) -> Result<SomeData, Error> {
     // validate data
@@ -97,6 +104,65 @@ async fn todays_shami_momo(
         .body(serde_json::to_string(&news)?))
 }
 
+async fn all_teams(
+    _client: web::Data<Client>,
+) -> Result<HttpResponse, Error> {
+    let mut res: Vec<Team> = Vec::new();
+
+    let t1 = Team { team_abbreviation: "鹿島".to_string(),
+                    active_area: "茨城県".to_string(),
+                    join_year: 1991 };
+    let t2 = Team { team_abbreviation: "浦和".to_string(),
+                    active_area: "埼玉県".to_string(),
+                    join_year: 1991 };
+    let t3 = Team { team_abbreviation: "水戸".to_string(),
+                    active_area: "茨城県".to_string(),
+                    join_year: 2000 };
+
+    res.push(t1);
+    res.push(t2);
+    res.push(t3);
+
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(serde_json::to_string(&res)?))
+}
+
+async fn teams_j1(
+    _client: web::Data<Client>,
+) -> Result<HttpResponse, Error> {
+    let mut res: Vec<Team> = Vec::new();
+
+    let t1 = Team { team_abbreviation: "鹿島".to_string(),
+                    active_area: "茨城県".to_string(),
+                    join_year: 1991 };
+    let t2 = Team { team_abbreviation: "浦和".to_string(),
+                    active_area: "埼玉県".to_string(),
+                    join_year: 1991 };
+
+    res.push(t1);
+    res.push(t2);
+
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(serde_json::to_string(&res)?))
+}
+
+async fn teams_j2(
+    _client: web::Data<Client>,
+) -> Result<HttpResponse, Error> {
+    let mut res: Vec<Team> = Vec::new();
+
+    let t3 = Team { team_abbreviation: "水戸".to_string(),
+                    active_area: "茨城県".to_string(),
+                    join_year: 2000 };
+
+    res.push(t3);
+
+    Ok(HttpResponse::Ok()
+        .content_type("application/json")
+        .body(serde_json::to_string(&res)?))
+}
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
@@ -114,6 +180,10 @@ async fn main() -> io::Result<()> {
             .data(Client::default())
             .service(web::resource("/something").route(web::post().to(create_something)))
             .service(web::resource("/shami_momo").route(web::get().to(todays_shami_momo)))
+
+            .service(web::resource("/api/v0/teams").route(web::get().to(all_teams)))
+            .service(web::resource("/api/v0/teams/j1").route(web::get().to(teams_j1)))
+            .service(web::resource("/api/v0/teams/j2").route(web::get().to(teams_j2)))
     })
     //.bind(endpoint)?
     .bind(("0.0.0.0", port))? 
